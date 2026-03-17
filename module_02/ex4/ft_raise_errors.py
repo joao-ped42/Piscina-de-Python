@@ -11,7 +11,7 @@ def check_plant(plant_name: str, water_level: int, sunlight_hours: int):
         )
     if (sunlight_hours < 2):
         raise ValueError(
-            f"Sunlight hours {sunlight_hours} is too low (min 12)"
+            f"Sunlight hours {sunlight_hours} is too low (min 2)"
         )
     print(f"Plant '{plant_name}' is healthy!")
 
