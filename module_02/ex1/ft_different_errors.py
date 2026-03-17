@@ -35,7 +35,7 @@ def test_error_types() -> None:
     try:
         print("\nTesting multiple errors togheter...")
         garden_operations("abc")
-    except (ValueError, ZeroDivisionError, FileNotFoundError, KeyError):
+    except Exception:
         print("Caught an error, but program continues")
     print("\nAll error types tested successfully!")
 

@@ -12,8 +12,8 @@ def water_plants(plant_list: list[str]) -> None:
 
 
 def test_watering_system() -> None:
-    plants_right = ["tomato", "lettuce", "carrots"]
-    plants_wrong = ["tomato", None, "carrots"]
+    plants_right: list[str] = ["tomato", "lettuce", "carrots"]
+    plants_wrong: list[str] = ["tomato", None, "carrots"]
     print("\nTesting normal watering...")
     water_plants(plants_right)
     print("\nTesting with error...")
