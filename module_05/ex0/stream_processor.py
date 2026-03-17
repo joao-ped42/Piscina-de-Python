@@ -98,6 +98,7 @@ def print_message(data: Any, cls: DataProcessor) -> None:
         cls.validate(cls, data)
     except Exception as error:
         print(f"Validation: [ERROR] {error}")
+        processed: str = ("[ALERT] ERROR level detected: Connection timed out")
     finally:
         output: str = cls.format_output(cls, processed)
         print(output)
