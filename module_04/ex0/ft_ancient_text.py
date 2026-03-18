@@ -1,16 +1,16 @@
 def main() -> None:
     try:
         print("Accessing Storage Vault: ancient_fragment.txt")
-        file: open = open("../data-generator-tools/ancient_fragment.txt",
-                          "r")
+        file: open = open("../ancient_fragment.txt", "r")
         text: str = file.read()
         print("Connection established...\n")
         print("RECOVERED DATA")
         print(text)
         print("\nData recovery complete. Storage unit disconnected.")
+    except FileNotFoundError:
+        print("File wasn't found")
     except Exception as error:
         print(f"An error occurred: {error}")
-    finally:
         file.close()
 
 
