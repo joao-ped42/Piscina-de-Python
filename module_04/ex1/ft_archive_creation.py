@@ -14,6 +14,7 @@ def main() -> None:
         print("\n\nData inscription complete. Storage unit sealed.")
         print("Archive 'new_discovery.txt' ready for long-term "
               "preservation.")
+        file.close()
     except FileNotFoundError:
         print("File wasn't found")
     except Exception as error:
