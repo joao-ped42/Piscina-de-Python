@@ -6,6 +6,7 @@ def main() -> None:
         print("Connection established...\n")
         print("RECOVERED DATA")
         print(text)
+        file.close()
         print("\nData recovery complete. Storage unit disconnected.")
     except FileNotFoundError:
         print("File wasn't found")
