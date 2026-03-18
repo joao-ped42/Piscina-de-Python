@@ -1,6 +1,6 @@
 def file_check(file_name: str, mode: str) -> None:
     print(f"\nCRISIS ALERT: Attempting access to '{file_name}'...")
-    with open(f"data-generator-tools/{file_name}", mode) as file:
+    with open(f"../data-generator-tools/{file_name}", mode) as file:
         line: str = file.read()
         print(f"SUCCESS: Archive recovered ''{line}''")
 

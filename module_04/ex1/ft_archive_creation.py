@@ -4,19 +4,21 @@ def main() -> None:
         lines: list[str] = ["[ENTRY 001] New quantum algorithm discovered",
                             "[ENTRY 002] Efficiency increased by 347%",
                             "[ENTRY 003] Archived by Data Archivist trainee"]
-        file = open("data-generator-tools/new_discovery.txt", "w")
+        file = open("../data-generator-tools/new_discovery.txt",
+                    "w")
         print("Storage unit created successfully...\n")
         print("Inscribing preservation data...")
         for line in lines:
             file.write(line)
             file.write("\n")
             print(line)
-        file.close()
         print("\nData inscription complete. Storage unit sealed.")
         print("Archive 'new_discovery.txt' ready for long-term"
               "preservation.")
     except Exception as error:
         print(f"An error occurred: {error}")
+    finally:
+        file.close()
 
 
 if (__name__ == "__main__"):
