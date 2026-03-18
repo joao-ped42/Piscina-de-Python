@@ -1,12 +1,12 @@
 def main() -> None:
     try:
         print("Initiating secure vault access...")
-        with open("data-generator-tools/classified_data.txt", "r") as file1:
+        with open("classified_data.txt", "r") as file1:
             print("Vault connection established with failsafe protocols\n")
             lines1: str = file1.read()
             print("SECURE EXTRACTION:")
             print(lines1)
-        with open("data-generator-tools/security_protocols.txt", "r") as file2:
+        with open("security_protocols.txt", "r") as file2:
             print("\nSECURE PRESERVATION:")
             lines2: str = file2.read()
             print(lines2)
