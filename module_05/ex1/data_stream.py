@@ -1,4 +1,5 @@
 from typing import Any, List, Dict, Union, Optional
+<<<<<<< HEAD
 from abc import ABC, abstractmethod
 
 
@@ -66,3 +67,6 @@ if (__name__ == "__main__"):
     print("=== CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
     main()
 >>>>>>> 09c4cac819ac4df9c4a7189846490da0670a8f1b
+=======
+from abc import ABC, abstractmethod
+>>>>>>> parent of 09c4cac (agora sim)
