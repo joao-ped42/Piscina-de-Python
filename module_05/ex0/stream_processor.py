@@ -49,9 +49,11 @@ class DataProcessor(ABC):
 
 class NumericProcessor(DataProcessor):
     def process(self, data: Any) -> str:
-        print(f"Processing data: {data}")
-        return (f"Processed {ft_len(data)} numeric valuers, "
-                f"sum={ft_sum(data)}, avg={ft_avg(data)}")
+        try:
+            return (f"Processed {ft_len(data)} numeric valuers, "
+                    f"sum={ft_sum(data)}, avg={ft_avg(data)}")
+        except Exception:
+            return ("Invalid data")
 
     def validate(self, data: Any) -> bool:
         if (None in data):
@@ -62,55 +64,86 @@ class NumericProcessor(DataProcessor):
 
 class TextProcessor(DataProcessor):
     def process(self, data: Any) -> str:
-        print(f'Processing data: "{data}"')
         return (f"Processed text: {ft_len(data)} characters, "
                 f"{count_words(data)} words")
 
     def validate(self, data: Any) -> bool:
         if (data is None):
             raise ValueError("Invalid Data")
-        print("Validation: Text data verified")
-        return (True)
+        if (data.__class__.__name__ == "str"):
+            print("Validation: Text data verified")
+            return (True)
+        print("Invalid data")
+        return (False)
 
 
 class LogProcessor(DataProcessor):
     def process(self, data: Any) -> str:
-        print(f"Processing data: {data}")
-        return (f"Processed {ft_len(data)} numeric valuers, "
-                f"sum={ft_sum(data)}, avg={ft_avg(data)}")
+        if ((not (":" in data)) or (not (data.__class__.__name__ == "str"))):
+            return ("Invalid log")
+        log_split: list[str] = data.split(":")
+        message_types: dict[str, str] = {"ERROR": "[ALERT]",
+                                         "INFO": "[INFO]",
+                                         "DEBUG": "[DEBUG]",
+                                         "CRITICAL": "[ALERT]",
+                                         "WARNING": "[ALERT]"}
+        return (f"{message_types[log_split[0].upper()]} "
+                f"{log_split[0].upper()} level detected:"
+                f"{log_split[1]}")
 
     def validate(self, data: Any) -> bool:
+        log_types: set[str] = {"DEBUG", "ERROR", "WARNING", "INFO", "CRITICAL"}
         if (data is None):
             raise ValueError("Invalid Data")
-        print("Validation: Log entry verified")
-        return (True)
+        log_type: str = (data.split(":")[0]).upper()
+        if (log_type in log_types):
+            print("Validation: Log entry verified")
+            return (True)
+        print("Validation: Invalid log entry")
+        return (False)
 
 
 def print_message(data: Any, cls: DataProcessor) -> None:
-    if (cls is NumericProcessor):
+    if (cls.__class__ is NumericProcessor):
         print("\nInitializing Numeric Processor...")
-    elif (cls is TextProcessor):
+    elif (cls.__class__ is TextProcessor):
         print("\nInitializing Text Processor...")
     else:
         print("\nInitializing Log Processor...")
     try:
-        processed: str = cls.process(cls, data)
-        cls.validate(cls, data)
-    except Exception as error:
-        print(f"Validation: [ERROR] {error}")
-        processed: str = ("[ALERT] ERROR level detected: Connection timed out")
-    finally:
-        output: str = cls.format_output(cls, processed)
+        print(f"Processing data: {data}")
+        processed: str = cls.process(data)
+        cls.validate(data)
+        output: str = cls.format_output(processed)
         print(output)
+    except Exception as error:
+        print(f"Validation: {error}")
+        print("Output: Invalid Data")
 
 
 def main() -> None:
-    print_message([1, 2, 3, 4, 5], NumericProcessor)
-    print_message("Hello Nexus World", TextProcessor)
-    print_message(None, LogProcessor)
+
+    num_proc: DataProcessor = NumericProcessor()
+    text_proc: DataProcessor = TextProcessor()
+    log_proc: DataProcessor = LogProcessor()
+
+    print_message([1, 2, 3, 4, 5], num_proc)
+    print_message("Hello World!", text_proc)
+    print_message("ERROR: Connection timeout", log_proc)
+
+    print("\n=== Polymorphic Processing Demo ===")
+    processors: List[tuple]
+    processors = [(num_proc, [1, 2, 3]),
+                  (text_proc, "sonic naruto"),
+                  (log_proc, "INFO: System ready")]
+    i: int = 1
+    print("\nProcessing multiple data types through same interface...")
+    for processor, data in processors:
+        print(f"Result {i}: {processor.process(data)}")
+        i += 1
 
 
 if (__name__ == "__main__"):
     print("=== CODE NEXUS - DATA PROCESSOR FOUNDATION ===")
     main()
-    print("\n=== Polymorphic Processing Demo ===")
+    print("\nFoundation systems online. Nexus ready for advanced streams.")
