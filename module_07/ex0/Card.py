@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 
 class Card(ABC):
@@ -7,9 +7,8 @@ class Card(ABC):
         self.cost: int = cost
         self.rarity: str = rarity
 
-    @abstractmethod
     def play(self, game_state: dict) -> dict:
-        ...
+        pass
 
     def get_card_info(self) -> dict:
         print("\nCard Info:")
