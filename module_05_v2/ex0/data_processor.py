@@ -50,8 +50,9 @@ class NumericProcessor(DataProcessor):
                     self.datas_processed.append(str(num))
             else:
                 raise ValueError("Improper numeric data")
-        elif (not isinstance(data, (str, dict, tuple, bool))):
+        elif (isinstance(data, (int, float))):
             if (data in self.validated_data or self.validate(data)):
+                print(f" Processing {data}")
                 ret: str = str(data)
                 self.datas_processed.append(ret)
         else:
@@ -75,12 +76,25 @@ class TextProcessor(DataProcessor):
         return (False)
 
     def ingest(self, data: Any) -> None:
-        pass
+        if (isinstance(data, list)):
+            if ((tuple(data) in self.validated_data) or (self.validate(data))):
+                print(f" Processing {data}")
+                for num in data:
+                    self.datas_processed.append(str(num))
+            else:
+                raise ValueError("Improper text data")
+        elif (isinstance(data, str)):
+            if (data in self.validated_data or self.validate(data)):
+                print(f" Processing {data}")
+                self.datas_processed.append(data)
+        else:
+            raise ValueError("Improper text data")
 
 
 class LogProcessor(DataProcessor):
     def __init__(self):
         super().__init__()
+        self.validated_dicts: list = []
 
     @staticmethod
     def validate_dict(dic: dict) -> bool:
@@ -92,13 +106,52 @@ class LogProcessor(DataProcessor):
         return (ret)
 
     def validate(self, data: Any) -> bool:
+        if (not isinstance(data, (dict, list))):
+            return (False)
+        elif (isinstance(data, dict)):
+            ret: bool = self.validate_dict(data)
+            if (ret):
+                self.validated_dicts.append(data)
+            return (ret)
+        elif (isinstance(data, list)):
+            for dic in data:
+                if (not isinstance(dic, dict)):
+                    return (False)
+            ret = True
+            for dic in data:
+                ret = ret and self.validate_dict(dic)
+            if (ret):
+                self.validated_dicts.append(data)
+            return (ret)
         return (False)
 
     def ingest(self, data: Any) -> None:
-        pass
+        if (isinstance(data, list)):
+            if (data in self.validated_dicts or self.validate(data)):
+                print(f" Processing {data}")
+                for dic in data:
+                    try:
+                        self.datas_processed.append(
+                            f"{dic["log_level"]}: {dic["log_message"]}")
+                    except KeyError:
+                        print("Invalid kind of log level or message")
+            else:
+                raise ValueError("Improper log data")
+        elif (isinstance(data, dict)):
+            if (data in self.validated_dicts or self.validate(data)):
+                print(f" Processing {data}")
+                try:
+                    self.datas_processed.append(
+                        f"{data["log_level"]}: {data["log_message"]}")
+                except KeyError:
+                    print(" Invalid kind of log level or message")
+            else:
+                raise ValueError("Improper log data")
+        else:
+            raise ValueError("Improper log data")
 
 
-def main() -> None:
+def numeric_processor() -> None:
     print("\nTesting Numeric Processor...")
     num_proc: NumericProcessor = NumericProcessor()
     print(" Trying to validate input '42':",
@@ -110,7 +163,10 @@ def main() -> None:
         num_proc.ingest("foo")
     except ValueError as e:
         print(f" Got exception: {e}")
-    num_proc.ingest([1, 2, 3, 4, 5])
+    try:
+        num_proc.ingest([1, 2, 3, 4, 5])
+    except ValueError as e:
+        print(f" Got exception: {e}")
     limit: int = 3
     print(f" Extracting {limit} values...")
     for _ in range(limit):
@@ -118,18 +174,48 @@ def main() -> None:
         if (-1 not in output):
             print(f" Numeric value {output[0]}: {output[1]}")
 
+
+def text_processor() -> None:
     print("\nTesting Text Processor...")
     text_proc: TextProcessor = TextProcessor()
     print(" Trying to validate input '42':",
           text_proc.validate(42))
     text_proc.validate(["Hello", "Nexus", "World"])
-    text_proc.ingest(["Hello", "Nexus", "World"])
-    limit = 1
-    print(f" Extracting {limit} value...")
+    try:
+        text_proc.ingest(["Hello", "Nexus", "World"])
+    except ValueError as e:
+        print(f" Got exception: {e}")
+    limit: int = 1
+    print(f" Extracting {limit} values...")
     for _ in range(limit):
         output = text_proc.output()
         if (-1 not in output):
             print(f" Text value {output[0]}: {output[1]}")
+
+
+def log_processor() -> None:
+    print("\nTesting Log Processor...")
+    log_proc: LogProcessor = LogProcessor()
+    print(" Trying to validate input 'Hello':", log_proc.validate("Hello"))
+    try:
+        log_proc.ingest([{'log_level': 'NOTICE',
+                        'log_message': 'Connection to server'},
+                         {'log_level': 'ERROR',
+                         'log_message': 'Unauthorized access!!'}])
+    except ValueError as e:
+        print(f" Got exception: {e}")
+    limit: int = 2
+    print(f" Extracting {limit} values...")
+    for _ in range(limit):
+        output = log_proc.output()
+        if (-1 not in output):
+            print(f" Text value {output[0]}: {output[1]}")
+
+
+def main() -> None:
+    numeric_processor()
+    text_processor()
+    log_processor()
 
 
 if (__name__ == "__main__"):
