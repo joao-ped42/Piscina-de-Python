@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Protocol
 
 
 class DataProcessor(ABC):
@@ -155,6 +155,11 @@ class LogProcessor(DataProcessor):
             raise ValueError("Improper log data")
 
 
+class ExportPlugin(Protocol):
+    def process_output(self, data: list[tuple[int, str]]) -> None:
+        ...
+
+
 class DataStream:
     def __init__(self) -> None:
         self.processors: dict = {}
@@ -225,46 +230,66 @@ class DataStream:
             print(f"{proc_name}: total {count[0]} items processed,",
                   f"remaining {count[1]} on processor")
 
+    def output_pipeline(self, nb: int, plugin: ExportPlugin) -> None:
+        for processor in self.processors.values():
+            data: list[tuple[int, str]] = []
+            for _ in range(nb):
+                data.append(processor.output())
+            plugin.process_output(data)
+
+
+class CSVExport:
+    def process_output(self, data: list[tuple[int, str]]) -> None:
+        print("CSV Output:")
+        ret: list[str] = []
+        for mini_data in data:
+            ret.append(mini_data[1])
+        print(*ret, sep=", ")
+
+
+class JSONExport:
+    def process_output(self, data: list[tuple[int, str]]) -> None:
+        print("JSON Output:")
+        ret: dict[str, str] = {}
+        for mini_data in data:
+            ret.update({f"item_{mini_data[0]}": mini_data[1]})
+        print(ret)
+
 
 def main() -> None:
     data_stream: DataStream = DataStream()
-    data_stream.print_processors_stats()
-
-    num_proc: NumericProcessor = NumericProcessor()
-    text_proc: TextProcessor = TextProcessor()
-    log_proc: LogProcessor = LogProcessor()
-
-    data_stream.register_processor(num_proc)
+    processor_list: list[DataProcessor] = [NumericProcessor(),
+                                           TextProcessor(),
+                                           LogProcessor()]
+    for proc in processor_list:
+        data_stream.register_processor(proc)
     data: list = ['Hello world',
                   [3.14, -1, 2.71],
                   [{'log_level': 'WARNING',
                     'log_message': 'Telnet access! Use ssh instead'},
                    {'log_level': 'INFO',
-                    'log_message': 'User wil isconnected'}],
+                    'log_message': 'User wil is connected'}],
                   42, ['Hi', 'five']]
-    try:
-        data_stream.process_stream(data)
-    except Exception as e:
-        print(e)
+    data_stream.process_stream(data)
     data_stream.print_processors_stats()
 
-    data_stream.register_processor(text_proc)
-    data_stream.register_processor(log_proc)
-    try:
-        data_stream.process_stream(data)
-    except Exception as e:
-        print(e)
+    csv: CSVExport = CSVExport()
+    json: JSONExport = JSONExport()
+    data_stream.output_pipeline(3, csv)
     data_stream.print_processors_stats()
 
-    data_stream.processors["num_proc"].output()
-    data_stream.processors["num_proc"].output()
-    data_stream.processors["num_proc"].output()
-    data_stream.processors["text_proc"].output()
-    data_stream.processors["text_proc"].output()
-    data_stream.processors["log_proc"].output()
+    data = [21, ['I love AI', 'LLMs are wonderful', 'Stay healthy'],
+            [{'log_level': 'ERROR',
+             'log_message': '500 server crash'},
+            {'log_level': 'NOTICE',
+             'log_message': 'Certificateexpires in 10 days'}],
+            [32, 42, 64, 84, 128, 168], 'World hello']
+    data_stream.process_stream(data)
+    data_stream.print_processors_stats()
+    data_stream.output_pipeline(5, json)
     data_stream.print_processors_stats()
 
 
 if (__name__ == "__main__"):
-    print("=== Code Nexus - Data Stream ===")
+    print("=== Code Nexus - Data Pipeline ===")
     main()
