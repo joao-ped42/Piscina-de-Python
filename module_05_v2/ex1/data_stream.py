@@ -136,7 +136,7 @@ class LogProcessor(DataProcessor):
                 for dic in data:
                     try:
                         self.datas_processed.append(
-                            f"{dic["log_level"]}: {dic["log_message"]}")
+                            {dic["log_level"]: dic["log_message"]})
                     except KeyError:
                         print("Invalid kind of log level or message")
             else:
@@ -146,7 +146,7 @@ class LogProcessor(DataProcessor):
                 print(f" Processing {data}")
                 try:
                     self.datas_processed.append(
-                        f"{data["log_level"]}: {data["log_message"]}")
+                        {data["log_level"]: data["log_message"]})
                 except KeyError:
                     print(" Invalid kind of log level or message")
             else:
@@ -198,7 +198,11 @@ class DataStream:
 
         if (proc_name == "log_proc"):
             log_processor: LogProcessor = self.processors["log_proc"]
-            validated = len(log_processor.validated_dicts)
+            for log in log_processor.validated_dicts:
+                if (isinstance(log, list)):
+                    validated += len(log)
+                else:
+                    validated += 1
         else:
             for data in processor.validated_data:
                 if (isinstance(data, tuple)):

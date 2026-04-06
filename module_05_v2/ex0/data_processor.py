@@ -132,7 +132,8 @@ class LogProcessor(DataProcessor):
                 for dic in data:
                     try:
                         self.datas_processed.append(
-                            f"{dic["log_level"]}: {dic["log_message"]}")
+                            {dic["log_level"]: dic["log_message"]}
+                            )
                     except KeyError:
                         print("Invalid kind of log level or message")
             else:
@@ -142,7 +143,7 @@ class LogProcessor(DataProcessor):
                 print(f" Processing {data}")
                 try:
                     self.datas_processed.append(
-                        f"{data["log_level"]}: {data["log_message"]}")
+                        {data["log_level"]: data["log_message"]})
                 except KeyError:
                     print(" Invalid kind of log level or message")
             else:
