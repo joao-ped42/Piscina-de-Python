@@ -1,4 +1,3 @@
-from ex0.Pokemon import Pokemon
 import ex0
 
 
@@ -12,12 +11,12 @@ def pokeshowdown(factory: ex0.PokemonFactory) -> None:
     print(poke_evo.attack())
 
 
-def battle(attacker: Pokemon, opponent: Pokemon) -> None:
+def battle(attacker: ex0.Pokemon, opponent: ex0.Pokemon) -> None:
     print("\nTesting battle")
     print(attacker.describe())
     print("            vs.")
     print(opponent.describe())
-    print("           fight!")
+    print("          fight!")
     print(attacker.attack())
     print(opponent.attack())
 
@@ -27,6 +26,6 @@ if (__name__ == "__main__"):
     aqua: ex0.AquaFactory = ex0.AquaFactory()
     pokeshowdown(flame)
     pokeshowdown(aqua)
-    torchic: Pokemon = flame.create_base()
-    popplio: Pokemon = aqua.create_base()
+    torchic: ex0.Pokemon = flame.create_base()
+    popplio: ex0.Pokemon = aqua.create_base()
     battle(torchic, popplio)
