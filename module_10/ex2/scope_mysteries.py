@@ -35,7 +35,7 @@ def memory_vault() -> dict[str, Callable]:
         print(f"Store '{key}' = {value}")
         warehouse.update({key: value})
 
-    def recall(key: str) -> int:
+    def recall(key: str) -> int | str:
         try:
             return (warehouse[key])
         except KeyError:

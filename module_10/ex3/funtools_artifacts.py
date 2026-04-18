@@ -1,6 +1,7 @@
-from functools import reduce, partial
+from functools import reduce, partial, lru_cache, singledispatch
 from operator import add, mul
 from collections.abc import Callable
+from typing import Any
 
 
 def enchant(power: int, element: str, target: str) -> str:
@@ -25,10 +26,40 @@ def spell_reducer(spells: list[int], operation: str) -> int:
 
 def partial_enchanter(base_enchantment: Callable) -> dict[str, Callable]:
     fixed: Callable = partial(base_enchantment, power=50)
-    r: dict[str, Callable] = {"fortune": fixed("Fortune", "Pickaxe"),
-                              "fire_touch": fixed("Fire Touch", "Sword"),
-                              "silk_touch": fixed("Silk Touch", "Shovel")}
+    r: dict[str, Callable] = {"fortune": fixed(element="Fortune",
+                                               target="Pickaxe"),
+                              "fire_touch": fixed(element="Fire Touch",
+                                                  target="Sword"),
+                              "silk_touch": fixed(element="Silk Touch",
+                                                  target="Shovel")}
     return (r)
+
+
+@lru_cache
+def memoized_fibonacci(n: int) -> int:
+    if (n <= 0):
+        return (0)
+    elif (n == 1):
+        return (1)
+    return (memoized_fibonacci(n - 1) + memoized_fibonacci(n - 2))
+
+
+def spell_dispatcher() -> Callable[[Any], str]:
+    @singledispatch
+    def dispatching(argument: Any) -> str:
+        print(f"{type(argument)} is unknown.")
+
+    @dispatching.register(int)
+    def _(argument: int) -> str:
+        return (f"Damage spell: {argument} damage")
+
+    @dispatching.register(str)
+    def _(argument: str) -> str:
+        return (f"Enchantment: {argument}")
+
+    @dispatching.register(list)
+    def _(argument: list) -> str:
+        return (f"Multi-cast: {len(argument)} spells")
 
 
 def main() -> None:
@@ -39,7 +70,16 @@ def main() -> None:
     print("Max:", spell_reducer(numbers, "max"))
 
     print("\nTesting partial enchanter...")
-    partial_enchanter(enchant)
+    enchants: dict[str, Callable] = partial_enchanter(enchant)
+    for enc in enchants.values():
+        print(enc)
+
+    print("\nTesting memoized fibonacci...")
+    positions: list[int] = [0, 1, 10, 15]
+    for index in positions:
+        print(f"Fib({index}): {memoized_fibonacci(index)}")
+
+    print("\nTesting spell dispatcher...")
 
 
 if (__name__ == "__main__"):
