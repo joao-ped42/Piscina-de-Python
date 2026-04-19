@@ -17,6 +17,5 @@ def main() -> None:
     print(f"Zion Network: {os.getenv('ZION')}")
 
 
-
 if (__name__ == "__main__"):
     main()

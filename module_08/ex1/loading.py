@@ -1,6 +1,5 @@
 import importlib
 from importlib.metadata import version
-import sys
 
 
 def check_import() -> bool:
@@ -34,7 +33,7 @@ def main() -> None:
             print("Processing 1000 data points")
             proc = pd.DataFrame(data['results'])
             plt.figure(figsize=(12, 5))
-            plt.hist(proc['name'], range(3,16), 'mediumseagreen', 'black')
+            plt.hist(proc['name'], range(3, 16), 'mediumseagreen', 'black')
             print("Generating visualization...")
             plt.savefig('teste.png')
             print("\nAnalysis complete!")
