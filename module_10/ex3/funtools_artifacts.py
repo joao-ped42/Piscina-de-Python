@@ -47,19 +47,21 @@ def memoized_fibonacci(n: int) -> int:
 def spell_dispatcher() -> Callable[[Any], str]:
     @singledispatch
     def dispatching(argument: Any) -> str:
-        print(f"{type(argument)} is unknown.")
+        return (f"{type(argument)} is unknown.")
 
     @dispatching.register(int)
     def _(argument: int) -> str:
-        return (f"Damage spell: {argument} damage")
+        return (f"{argument} damage")
 
     @dispatching.register(str)
     def _(argument: str) -> str:
-        return (f"Enchantment: {argument}")
+        return (f"{argument}")
 
     @dispatching.register(list)
     def _(argument: list) -> str:
-        return (f"Multi-cast: {len(argument)} spells")
+        return (f"{len(argument)} spells")
+
+    return (dispatching)
 
 
 def main() -> None:
@@ -80,6 +82,13 @@ def main() -> None:
         print(f"Fib({index}): {memoized_fibonacci(index)}")
 
     print("\nTesting spell dispatcher...")
+    dispatcher = spell_dispatcher()
+    tests: dict[str, int | str | list] = {"Damage spell": 42,
+                                          "Enchantment": "fireball",
+                                          "Multi-cast": ["1", "3", "5"]}
+    for key, value in tests.items():
+        print(f"{key}: {dispatcher(value)}")
+    print(dispatcher({"naruto": 1}))
 
 
 if (__name__ == "__main__"):
